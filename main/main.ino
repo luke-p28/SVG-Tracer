@@ -9,7 +9,7 @@ String file = "";
 
 Servo servo_z;
 Servo servo_y;
-const double y_servo_height = 90; //mm
+const double y_servo_height = 70; //mm
 
 String html(){
   String output = ""
@@ -38,7 +38,7 @@ void draw_svg(String svg){
         Serial.print(xCoord);
         Serial.print(", ");
         Serial.println(curNum.toDouble());
-        point_to_coords(xCoord, curNum.toDouble());
+        point_to_coords(-xCoord/4, (1100-curNum.toDouble())/4);
         delay(1000);
         hasXCoord = false;
       } else {
@@ -52,7 +52,7 @@ void draw_svg(String svg){
   Serial.print(xCoord);
   Serial.print(", ");
   Serial.println(curNum.toDouble());
-  point_to_coords(xCoord, curNum.toDouble());
+  point_to_coords(-xCoord/4, (1100-curNum.toDouble())/4);
 }
 
 double process_angle(double rad){
@@ -64,21 +64,32 @@ double process_angle(double rad){
 }
 
 double z_angle(double x, double y){
-  return process_angle(atan(y / x))/2;
+  // if (x == 0){
+  //   return 0;
+  // }
+  return process_angle(atan2(y, x))/2;
 }
 
 double y_angle(double x, double y) {
-  return process_angle(atan(sqrt(x*x + y*y) / y_servo_height))+3;
+  return process_angle(atan2(sqrt(x*x + y*y), y_servo_height));
 }
 
 void point_to_coords(double x, double y){
+  Serial.print("Pointing to: ");
+  Serial.print(x);
+  Serial.print(", ");
+  Serial.println(y);
+  Serial.print("Z angle: ");
+  Serial.print(z_angle(x, y));
+  Serial.print(", Y angle: ");
+  Serial.println(y_angle(x,y));
   servo_z.write(z_angle(x, y));
   servo_y.write(y_angle(x, y));
 }
 
 void setup(){
-  servo_z.attach(D5, 500, 2500);
-  servo_y.attach(D6, 500, 2500);
+  servo_z.attach(D5, 600, 2400);
+  servo_y.attach(D6, 550, 2450);
   pinMode(D0, OUTPUT);
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
@@ -91,7 +102,7 @@ void setup(){
   }
   digitalWrite(D0, LOW);
   server.on("/", [](){server.send(200, "text/html", html());});
-  server.on("/upload", HTTP_POST, [](){server.send(200);Serial.println("test");}, [](){
+  server.on("/upload", HTTP_POST, [](){/*server.send(200);*/Serial.println("test");}, [](){
     if (server.upload().status == UPLOAD_FILE_START){
       Serial.println(server.upload().filename);
       fileName = server.upload().filename;
@@ -107,20 +118,27 @@ void setup(){
       Serial.print(file);
       Serial.println("'");
       draw_svg(file);
+      Serial.println("AaAa");
       server.sendHeader("Location", "/");
       server.send(303);
+      Serial.println("BbBb");
     }
   });
   server.begin();
   Serial.println();
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
-  // servo_z.write(z_angle(-100, 100));
-  // servo_y.write(y_angle(-100, 100));
-  point_to_coords(-100, 100);
+  point_to_coords(100, 100);
 }
 
 
 void loop(){
+  // servo_z.write(45);
+  // servo_y.write(90);
+  // delay(2000);
+  // servo_y.write(45);
+  // delay(2000);
+  // servo_y.write(0);
+  // delay(2000);
   server.handleClient();
 }
