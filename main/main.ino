@@ -38,7 +38,7 @@ void draw_svg(String svg){
         Serial.print(xCoord);
         Serial.print(", ");
         Serial.println(curNum.toDouble());
-        point_to_coords(-xCoord/4, (1100-curNum.toDouble())/4);
+        point_to_coords(-xCoord*0.353, (1100-curNum.toDouble())*0.353);
         delay(1000);
         hasXCoord = false;
       } else {
@@ -52,7 +52,7 @@ void draw_svg(String svg){
   Serial.print(xCoord);
   Serial.print(", ");
   Serial.println(curNum.toDouble());
-  point_to_coords(-xCoord/4, (1100-curNum.toDouble())/4);
+  point_to_coords(-xCoord*0.353, (1100-curNum.toDouble())*0.353);
 }
 
 double process_angle(double rad){
@@ -133,10 +133,11 @@ void setup(){
 
 
 void loop(){
-  // servo_z.write(45);
+  // servo_z.write(0);
   // servo_y.write(90);
   // delay(2000);
   // servo_y.write(45);
+  // servo_z.write(45);
   // delay(2000);
   // servo_y.write(0);
   // delay(2000);
