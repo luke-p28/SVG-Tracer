@@ -21,6 +21,8 @@ String html(){
   "</form>";
   output += fileName == "" ? "No file uploaded" : "File name: " + fileName;
   output += ""
+  "<br><br>"
+  "<button> <a href='/redo' style='color: black; text-decoration: none;'> Redo Trace </a> </button>"
   "</body>"
   "</html>";
   return output;
@@ -123,6 +125,11 @@ void setup(){
       server.send(303);
       Serial.println("BbBb");
     }
+  });
+  server.on("/redo", [](){
+    draw_svg(file);
+    server.sendHeader("Location", "/");
+    server.send(303);
   });
   server.begin();
   Serial.println();
